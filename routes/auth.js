@@ -15,7 +15,10 @@ passport.use(new GoogleStrategy(
   env,
 function(token,tokenSecret,profile,done){
   // done(null, profile,token);
-  console.log(profile);
+  // console.log(profile);
+  // console.log(profile._json.image.url);
+  var user = insertUser(profile);
+  console.log(user);
   done(null,profile);
 }
 ));
@@ -24,7 +27,6 @@ router.get('/google/callback',
   passport.authenticate('google', {successRedirect: '/',failureRedirect: '/error'}),
     //
   function(req,res){
-    console.log();
     res.redirect('/');
   }
 );
@@ -36,7 +38,15 @@ router.get('/google',
     // function will not be called.
   });
 
-
+  function insertUser(profile){
+    var user = {
+    first_name:profile._json.name.givenName,
+    last_name:profile._json.name.familyName,
+    profile_img_url:profile._json.image.url,
+    oauthid:profile._json.id
+  };
+    return user;
+  }
 
 
 module.exports = {
