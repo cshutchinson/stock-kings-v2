@@ -18,6 +18,7 @@
     "passport": "^0.3.2",
     "passport-google-oauth": "^0.2.0",
     "pg": "^4.4.3",
+    "request-promise": "^1.0.2",
     "serve-favicon": "~2.3.0"
   }
 }
