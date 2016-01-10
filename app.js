@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var symbols = require('./routes/symbols');
 
 var auth = require('./routes/auth');
 var session = require('express-session');
@@ -47,6 +48,7 @@ auth.passport.deserializeUser(function(user, done) {
 app.use('/', routes);
 app.use('/users', users);
 app.use('/auth',auth.router);
+app.use('/symbols', symbols);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
