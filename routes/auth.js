@@ -10,7 +10,6 @@ var env = {
   callbackURL:process.env.CALLBACK_URL
 }
 
-console.log(env);
 passport.use(new GoogleStrategy(
   env,
 function(token,tokenSecret,profile,done){
