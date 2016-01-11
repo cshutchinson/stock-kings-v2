@@ -1,10 +1,12 @@
 var express = require('express');
 var router = express.Router();
+var knex = require('../db/knex');
+
 
 /* GET users listing. */
-// TODO: add current_price to symbols table
 // requires id and date in req.body
 router.get('/portfolio', function(req, res) {
+  var transArray = [];
   knex('transactions')
     .select(
       'symbols.symbol',
@@ -13,25 +15,46 @@ router.get('/portfolio', function(req, res) {
       'transactions.share_price as pps',
       'symbols.current_price as cp'
     )
-    .innerJoin('symbols', 'symbol.id', 'transactions.symbol_id')
-    .where('transactions.user_id', 'req.body.id')
-    .andWhere('transactions.open_datetime', 'req.body.date')
+    .innerJoin('symbols', 'symbols.id', 'transactions.symbol_id')
+    .where('transactions.user_id', req.body.id)
+    .andWhere('transactions.open_datetime','>=', req.body.date)
     .orderBy('transactions.open_datetime', 'asc')
     .then(function(results){
-      var transArray = [];
+      console.log(results);
       results.forEach(function(stock){
         transArray.push({
-          symbol: stock.symbols.symbol,
-          companyName: stock.symbols.name,
-          shares: stock.transactions.qty,
-          pps: stock.pps,
-          currentSharePrice: stock.cp,
-          percentChange: (stock.cp - stock.pps)/stock.pps,
-          dollarChange: stock.cp - stock.pps
+          symbol: stock.symbol,
+          companyName: stock.name,
+          shares: stock.qty,
+          pps: +stock.pps.toFixed(2),
+          currentSharePrice: +stock.cp.toFixed(2),
+          percentChange: (((stock.cp - stock.pps)/stock.pps)*100).toFixed(2)+'%',
+          dollarChange: +(stock.cp - stock.pps).toFixed(2)
         })
       })
+      res.json(aggregateTransactions(transArray));
     })
-  res.json(transArray);
 })
 
 module.exports = router;
+
+function aggregateTransactions(transArray){
+  temp = [];
+  transArray.sort(function(a,b){
+    return(a.symbol > b.symbol);
+  })
+  .forEach(function(elem){
+    if(temp.length===0){
+      temp.push(elem);
+    }
+    else if(!Object.is(temp[temp.length-1].symbol, elem.symbol)){
+      temp.push(elem);
+    } else {
+      temp[temp.length-1].pps =
+        (temp[temp.length-1].pps*temp[temp.length-1].qty +
+        elem.pps * elem.qty) / (temp[temp.length-1].qty + elem.qty);
+      temp[temp.length-1].qty += elem.qty;
+    }
+  })
+  return temp;
+}
