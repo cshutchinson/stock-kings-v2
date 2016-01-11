@@ -58,3 +58,18 @@ function aggregateTransactions(transArray){
   })
   return temp;
 }
+
+router.get('/balance',function(req,res){
+  var ans = {};
+  knex('users').where('id',req.body.id).first().
+  then(function(user){
+    // console.log(user);
+    ans = {
+      first_name:user.first_name,
+      last_name:user.last_name,
+      current_cash:user.current_cash
+    }
+    // console.log(ans);
+    res.json(ans);
+})
+});
