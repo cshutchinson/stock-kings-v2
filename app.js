@@ -25,7 +25,7 @@ app.set('view engine', 'jade');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(cors({
-  origin: 'http://127.0.0.1:8080',
+  origin: 'http://localhost:8080',
   methods: ['GET', 'PUT', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,

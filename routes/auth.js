@@ -36,7 +36,14 @@ router.get('/google',
   function(req, res){
     // The request will be redirected to Facebook for authentication, so this
     // function will not be called.
+    console.log(req.user)
+    res.end('success')
   });
+
+  router.get('/logout', function(req, res){
+    req.logout()
+    res.redirect('/')
+  })
 
   function insertUser(profile){
     var user = {
