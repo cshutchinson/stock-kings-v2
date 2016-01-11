@@ -24,10 +24,10 @@ function(token,tokenSecret,profile,done){
 ));
 
 router.get('/google/callback',
-  passport.authenticate('google', {successRedirect: '/',failureRedirect: '/error'}),
+  passport.authenticate('google'),
     //
   function(req,res){
-    res.redirect('/');
+    res.send('success');
   }
 );
 
