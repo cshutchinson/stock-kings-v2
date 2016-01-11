@@ -17,7 +17,7 @@ router.get('/prices', function(req, res){
     var symbolList = '';
     symbols.forEach(function(symbol){
       symbolList += symbol.symbol + ',';
-    })
+    });
     res.redirect('/symbols/prices/' + symbolList);
   })
 });
@@ -36,6 +36,7 @@ router.get('/prices/:stock', function(req, res){
   };
   rp(options)
       .then(function (data) {
+         insertStockPricesDB(formatResponse(data));
          res.json(formatResponse(data));
       })
       .catch(function (err) {
@@ -56,4 +57,21 @@ function formatResponse(stockData){
     })
   })
   return stockPriceData;
+}
+
+function insertStockPricesDB(stockDataArray){
+  var promiseArray = [];
+  return knex('symbols').then(function(){
+    var idCount = 1;
+    stockDataArray.forEach(function(stock){
+      promiseArray.push(knex('symbols')
+      .where('id', idCount)
+      .update({
+        current_price: stock.price,
+        volume: stock.volume
+      }))
+      idCount++;
+    });
+    return Promise.all(promiseArray);
+  });
 }
