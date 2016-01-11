@@ -5,7 +5,7 @@ var knex = require('../db/knex');
 
 /* GET users listing. */
 // requires id and date in req.body
-router.get('/portfolio', function(req, res) {
+router.get('/portfolio/:id/:date', function(req, res) {
   var transArray = [];
   knex('transactions')
     .select(
@@ -16,8 +16,8 @@ router.get('/portfolio', function(req, res) {
       'symbols.current_price as cp'
     )
     .innerJoin('symbols', 'symbols.id', 'transactions.symbol_id')
-    .where('transactions.user_id', req.body.id)
-    .andWhere('transactions.open_datetime','>=', req.body.date)
+    .where('transactions.user_id', req.params.id)
+    .andWhere('transactions.open_datetime','>=', req.params.date)
     .orderBy('transactions.open_datetime', 'asc')
     .then(function(results){
       console.log(results);
@@ -59,9 +59,9 @@ function aggregateTransactions(transArray){
   return temp;
 }
 
-router.get('/balance',function(req,res){
+router.get('/balance/:id',function(req,res){
   var ans = {};
-  knex('users').where('id',req.body.id).first().
+  knex('users').where('id',req.params.id).first().
   then(function(user){
     // console.log(user);
     ans = {
@@ -73,3 +73,36 @@ router.get('/balance',function(req,res){
     res.json(ans);
 })
 });
+
+router.post('/buy', function(req,res){
+  knex('symbols').select('symbol','current_price').where('id',req.body.symbol_id)
+  .first()
+  .then(function(stock){
+    knex('transactions').insert({
+      symbol_id:req.body.symbol_id,
+      user_id:req.body.user_id,
+      share_price:stock.current_price,
+      open_datetime:new Date(),
+      qty:req.body.qty
+    },'id').then(function(id){
+      res.json('success buy');
+    })
+  })
+})
+
+router.post('/sell', function(req,res){
+  knex('symbols').select('symbol','current_price').where('id',req.body.symbol_id)
+  .first()
+  .then(function(stock){
+    knex('transactions').insert({
+      symbol_id:req.body.symbol_id,
+      user_id:req.body.user_id,
+      share_price:stock.current_price,
+      open_datetime:new Date(),
+      qty:-(req.body.qty)
+    },'id')
+    .then(function(id){
+      res.json(id);
+    })
+  })
+})
