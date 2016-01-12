@@ -54,7 +54,7 @@ function formatResponse(stockData){
       volume: stock.resource.fields.volume
     })
   })
-  console.log(stockPriceData);
+  // console.log(stockPriceData);
   return stockPriceData;
 }
 
