@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-
+var knex =
 
 var env = {
   clientID:process.env.CLIENT_ID,
@@ -13,18 +13,17 @@ var env = {
 passport.use(new GoogleStrategy(
   env,
 function(token,tokenSecret,profile,done){
-  // done(null, profile,token);
-  // console.log(profile);
-  // console.log(profile._json.image.url);
+
   var user = insertUser(profile);
-  console.log(user);
+
+
   done(null,profile);
 }
 ));
 
 router.get('/google/callback',
   passport.authenticate('google'),
-    //
+
   function(req,res){
     res.send('success');
   }
@@ -35,6 +34,7 @@ router.get('/google',
   function(req, res){
     // The request will be redirected to Facebook for authentication, so this
     // function will not be called.
+
     console.log(req.user)
     res.end('success')
   });
