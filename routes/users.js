@@ -20,7 +20,7 @@ router.get('/portfolio/:id/:date', function(req, res) {
     .andWhere('transactions.open_datetime','>=', req.params.date)
     .orderBy('transactions.open_datetime', 'asc')
     .then(function(results){
-      console.log(results);
+      // console.log(results);
       results.forEach(function(stock){
         transArray.push({
           symbol: stock.symbol,
@@ -32,6 +32,7 @@ router.get('/portfolio/:id/:date', function(req, res) {
           dollarChange: +(stock.cp - stock.pps).toFixed(2)
         })
       })
+      console.log(transArray);
       res.json(aggregateTransactions(transArray));
     })
 })
