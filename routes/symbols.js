@@ -50,8 +50,6 @@ router.get('/prices/:stock', function(req, res){
       });
 })
 
-module.exports = router;
-
 function formatResponse(stockData){
   var stockPriceData =[];
   stockData.list.resources.forEach(function(stock){
@@ -62,22 +60,23 @@ function formatResponse(stockData){
       volume: stock.resource.fields.volume
     })
   })
+  console.log(stockPriceData);
   return stockPriceData;
 }
 
 function insertStockPricesDB(stockDataArray){
   var promiseArray = [];
   return knex('symbols').then(function(){
-    var idCount = 1;
     stockDataArray.forEach(function(stock){
       promiseArray.push(knex('symbols')
-      .where('id', idCount)
+      .where('symbol', stock.symbol)
       .update({
         current_price: stock.price,
         volume: stock.volume
       }))
-      idCount++;
     });
     return Promise.all(promiseArray);
   });
 }
+
+module.exports = router;
