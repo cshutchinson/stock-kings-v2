@@ -13,6 +13,7 @@ router.get('/', function(req, res) {
 });
 
 router.get('/prices', function(req, res){
+  console.log(req.user)
   if(!req.isAuthenticated()){
 
     res.end('Please Sign In')

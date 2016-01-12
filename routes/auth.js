@@ -38,16 +38,27 @@ function(token,tokenSecret,profile,done){
   }
 ));
 
-router.get('/google/callback',
-  passport.authenticate('google'),
-    //
-  function(req,res){
-    res.send('success');
-  }
-);
+router.get('/google/callback', function(req, res, next) {
+  passport.authenticate('google', function(err, user, info){
+    if(err) {
+      next(err);
+    } else if(user) {
+      req.logIn(user, function(err) {
+        if (err) {
+          next(err);
+        }
+        else {
+          res.redirect(process.env.CALLBACK_URL);
+        }
+      });
+    } else if (info) {
+      next(info);
+    }
+  })(req, res, next);
+});
 
-router.get('/google',
-  passport.authenticate('google', { scope: 'profile'  }),
+
+router.get('/google', passport.authenticate('google', { scope: 'profile'  }),
   function(req, res){
     // The request will be redirected to Facebook for authentication, so this
     // function will not be called.
@@ -55,9 +66,9 @@ router.get('/google',
     res.end('success')
   });
 
-  router.get('/logout', function(req, res){
+router.get('/logout', function(req, res){
     req.logout()
-    res.redirect('/')
+    res.end("logged out")
   })
 
   function insertUser(profile){

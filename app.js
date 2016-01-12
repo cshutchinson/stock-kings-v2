@@ -10,7 +10,6 @@ var cors = require('cors')
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var symbols = require('./routes/symbols');
-
 var auth = require('./routes/auth');
 var session = require('express-session');
 
@@ -25,6 +24,7 @@ app.set('view engine', 'jade');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(cors({
+  //TODO change origin once deployed
   origin: 'http://localhost:8080',
   methods: ['GET', 'PUT', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
