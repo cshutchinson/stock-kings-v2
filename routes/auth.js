@@ -5,48 +5,47 @@ var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var knex = require('../db/knex');
 
 var env = {
-  clientID:process.env.CLIENT_ID,
-  clientSecret:process.env.CLIENT_SECRET,
-  callbackURL:process.env.CALLBACK_URL
+  clientID: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+  callbackURL: process.env.CALLBACK_URL
 }
 
 passport.use(new GoogleStrategy(
   env,
-function(token,tokenSecret,profile,done){
-  var user = insertUser(profile);
+  function(token, tokenSecret, profile, done) {
+    var user = insertUser(profile);
 
-  knex('users').select().where('oauthid', user.oauthid).first()
-  .then(function(person){
-    if(!person){
-      knex('users').insert({
-        first_name: user.first_name,
-        last_name: user.last_name,
-        oauthid: user.oauthid,
-        profile_image_url: user.profile_img_url
-      }, 'id').then(function(id){
-        user.id = id[0];
-        done(null,user);
-      });
-    } else{
-      user.id = person.id;
-      done(null,user);
-      }
-    })
+    knex('users').select().where('oauthid', user.oauthid).first()
+      .then(function(person) {
+        if (!person) {
+          knex('users').insert({
+            first_name: user.first_name,
+            last_name: user.last_name,
+            oauthid: user.oauthid,
+            profile_image_url: user.profile_img_url
+          }, 'id').then(function(id) {
+            user.id = id[0];
+            done(null, user);
+          });
+        } else {
+          user.id = person.id;
+          done(null, user);
+        }
+      })
   }
 
 ));
 
 router.get('/google/callback', function(req, res, next) {
-  passport.authenticate('google', function(err, user, info){
+  passport.authenticate('google', function(err, user, info) {
     console.log('made it here 2')
-    if(err) {
+    if (err) {
       next(err);
-    } else if(user) {
+    } else if (user) {
       req.logIn(user, function(err) {
         if (err) {
           next(err);
-        }
-        else {
+        } else {
           console.log('redirecting to client')
           res.redirect(process.env.CLIENT_HOST);
         }
@@ -58,8 +57,10 @@ router.get('/google/callback', function(req, res, next) {
 });
 
 
-router.get('/google', passport.authenticate('google', { scope: 'profile'  }),
-  function(req, res){
+router.get('/google', passport.authenticate('google', {
+    scope: 'profile'
+  }),
+  function(req, res) {
     // The request will be redirected to Facebook for authentication, so this
     // function will not be called.
 
@@ -67,23 +68,23 @@ router.get('/google', passport.authenticate('google', { scope: 'profile'  }),
     res.end('success')
   });
 
-router.get('/logout', function(req, res){
-    req.logout()
-    res.end("logged out")
-  })
+router.get('/logout', function(req, res) {
+  req.logout()
+  res.send('logged out successfully')
+})
 
-  function insertUser(profile){
-    var user = {
-    first_name:profile._json.name.givenName,
-    last_name:profile._json.name.familyName,
-    profile_image_url:profile._json.image.url,
-    oauthid:profile._json.id
+function insertUser(profile) {
+  var user = {
+    first_name: profile._json.name.givenName,
+    last_name: profile._json.name.familyName,
+    profile_image_url: profile._json.image.url,
+    oauthid: profile._json.id
   };
-    return user;
-  }
+  return user;
+}
 
 
 module.exports = {
   router: router,
-  passport:passport
+  passport: passport
 }
