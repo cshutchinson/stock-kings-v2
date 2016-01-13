@@ -47,7 +47,7 @@ router.get('/end', function(req, res){
 router.get('/allTimeStats', function(req,res){
   // Noah
   // get list of all user_ids in balance_history
-
+  
     // for each user_id sum balance_history.cash_amount
     // build array of objects {user.id, user.firstname, user.lastName,
     // and user.profit_loss, }
