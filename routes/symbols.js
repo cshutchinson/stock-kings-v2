@@ -13,6 +13,10 @@ router.get('/', function(req, res) {
 });
 
 router.get('/prices', function(req, res){
+  // Chris
+  // stop calling yahoo api here instead let server call api
+  // front end call this route to retrieve stock info from symbols
+  // tab
   console.log(req.user)
   if(!req.isAuthenticated()){
 
