@@ -4,36 +4,36 @@ var knex = require('../db/knex');
 var rp = require('request-promise');
 
 
-// router.get('/status', function(req, res){
-//   // Chris
-//   // get list of all user_ids in current day transactions
-//
-//     // for each user_id get symbol_id, qty, and retrieve current price
-//     // generate total cash if all shares and sum (var=cashFromEquity)
-//     // to this number add current cash from users table and subtract 10k
-//     // results is profit / (loss) for each user each day
-//
-//     // return json object {user.id, user.firstName, user.lastName,
-//     // and user.profit_loss }
-//   knex('transactions')
-//     .select(
-//       'transactions.user_id',
-//       'transactions.symbol_id',
-//       'transactions.qty',
-//       'shares.current_price',
-//       'users.current_cash'
-//     )
-//     .innerJoin('symbols', 'symbols.id', 'transactions.symbol_id')
-//     // innerjoin users
-//     .innerJoin('users', )
-//     .where('transactions.dateTime', '>=', new Date().toDateString)
-//     // group by user_id
-//     // agggregate sum by transactions.value
-//     // new field = aggregated equity value + users.current_cash
-//
-//
-//
-// });
+router.get('/status', function(req, res){
+  // Chris
+  // get list of all user_ids in current day transactions
+
+    // for each user_id get symbol_id, qty, and retrieve current price
+    // generate total cash if all shares and sum (var=cashFromEquity)
+    // to this number add current cash from users table and subtract 10k
+    // results is profit / (loss) for each user each day
+
+    // return json object {user.id, user.firstName, user.lastName,
+    // and user.profit_loss }
+  knex('transactions')
+    .select(
+      'transactions.user_id',
+      'transactions.symbol_id',
+      'transactions.qty',
+      'shares.current_price',
+      'users.current_cash'
+    )
+    .innerJoin('symbols', 'symbols.id', 'transactions.symbol_id')
+    // innerjoin users
+    .innerJoin('users', )
+    .where('transactions.dateTime', '>=', new Date().toDateString)
+    // group by user_id
+    // agggregate sum by transactions.value
+    // new field = aggregated equity value + users.current_cash
+
+
+
+});
 
 router.get('/end', function(req, res){
     // Chris

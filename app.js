@@ -18,6 +18,7 @@ var moment = require('moment');
 var tz = require('moment-timezone');
 
 var currentGameDate = undefined;
+
 setInterval(stockFiveMinutes,300000);
 // Noah
 // call function to update currentGameDate in game.js
