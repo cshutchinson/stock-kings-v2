@@ -10,10 +10,41 @@ var cors = require('cors')
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var symbols = require('./routes/symbols');
+var game = require('./routes/game');
 
 var auth = require('./routes/auth');
 var session = require('express-session');
+var moment = require('moment');
+var tz = require('moment-timezone');
 
+var currentGameDate = undefined;
+
+// Noah
+// call function to update currentGameDate in game.js
+
+// Noah blocked on Chris writting function
+// setInterval() on endGameAndUpdateBalanceHistoryTable() in game.js at 4pm
+
+// Noah
+// setInterval() on updateCurrentGameDate in game.js at 4pm
+
+// Noah
+// setInterval() on callYahooUpdateSymbolsFiveMins every five minutes when
+// market is oepn and not closed EST times and gameDate is not Saturday
+// or a Sunday
+setInterval(stockFiveMinutes,300000);
+
+function stockFiveMinutes(){
+  var now = moment().format('dddd');
+  var time = moment().tz('America/New_York').format('HH:mm');
+  if(now != 'Saturday' && now != 'Sunday'){
+    if(time > '09:30' && time < '16:00'){
+      //Call yahoo api function
+      game.callYahooUpdateSymbols;
+      console.log('called yahoo update');
+    }
+  }
+}
 
 var app = express();
 
@@ -25,6 +56,7 @@ app.set('view engine', 'jade');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(cors({
+  //TODO change origin once deployed
   origin: 'http://localhost:8080',
   methods: ['GET', 'PUT', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -58,6 +90,7 @@ app.use('/', routes);
 app.use('/users', users);
 app.use('/auth',auth.router);
 app.use('/symbols', symbols);
+app.use('/game', game.router);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

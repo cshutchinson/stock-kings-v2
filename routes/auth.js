@@ -13,7 +13,6 @@ var env = {
 passport.use(new GoogleStrategy(
   env,
 function(token,tokenSecret,profile,done){
-
   var user = insertUser(profile);
 
   knex('users').select().where('oauthid', user.oauthid).first()
@@ -37,6 +36,7 @@ function(token,tokenSecret,profile,done){
 
 ));
 
+<<<<<<< HEAD
 router.get('/google/callback',
   passport.authenticate('google'),
 
@@ -44,9 +44,31 @@ router.get('/google/callback',
     res.send('success');
   }
 );
+=======
+router.get('/google/callback', function(req, res, next) {
+  passport.authenticate('google', function(err, user, info){
+    console.log('made it here 2')
+    if(err) {
+      next(err);
+    } else if(user) {
+      req.logIn(user, function(err) {
+        if (err) {
+          next(err);
+        }
+        else {
+          console.log('redirecting to client')
+          res.redirect(process.env.CLIENT_HOST);
+        }
+      });
+    } else if (info) {
+      next(info);
+    }
+  })(req, res, next);
+});
 
-router.get('/google',
-  passport.authenticate('google', { scope: 'profile'  }),
+>>>>>>> e12fc00d107a0c97186867fc019f0f8762663147
+
+router.get('/google', passport.authenticate('google', { scope: 'profile'  }),
   function(req, res){
     // The request will be redirected to Facebook for authentication, so this
     // function will not be called.
@@ -55,9 +77,9 @@ router.get('/google',
     res.end('success')
   });
 
-  router.get('/logout', function(req, res){
+router.get('/logout', function(req, res){
     req.logout()
-    res.redirect('/')
+    res.end("logged out")
   })
 
   function insertUser(profile){
