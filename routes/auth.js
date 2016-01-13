@@ -17,6 +17,7 @@ function(token,tokenSecret,profile,done){
   // done(null, profile,token);
   // console.log(profile);
   // console.log(profile._json.image.url);
+  console.log('made it here')
   var user = insertUser(profile);
   knex('users').select().where('oauthid', user.oauthid).first()
   .then(function(person){
@@ -40,6 +41,7 @@ function(token,tokenSecret,profile,done){
 
 router.get('/google/callback', function(req, res, next) {
   passport.authenticate('google', function(err, user, info){
+    console.log('made it here 2')
     if(err) {
       next(err);
     } else if(user) {
@@ -48,7 +50,8 @@ router.get('/google/callback', function(req, res, next) {
           next(err);
         }
         else {
-          res.redirect(process.env.CALLBACK_URL);
+          console.log('redirecting to client')
+          res.redirect(process.env.CLIENT_HOST);
         }
       });
     } else if (info) {
