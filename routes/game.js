@@ -24,15 +24,13 @@ router.get('/status', function(req, res){
       'users.current_cash'
     )
     .innerJoin('symbols', 'symbols.id', 'transactions.symbol_id')
-    // innerjoin users
-    .innerJoin('users', )
-    .where('transactions.dateTime', '>=', new Date().toDateString)
-    // group by user_id
-    // agggregate sum by transactions.value
-    // new field = aggregated equity value + users.current_cash
-
-
-
+    .innerJoin('users', 'users.id', 'transactions.user_id')
+    .where('transactions.dateTime', '>=', state.currentGameDate)
+    .groupBy('transactions.user_id')
+    .then(function(results){
+      console.log('status', results);
+      res.json(results);
+    })
 });
 
 router.get('/end', function(req, res){
