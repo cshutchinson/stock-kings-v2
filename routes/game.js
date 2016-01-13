@@ -153,5 +153,5 @@ function updateCurrentGameDate(){
 module.exports =
   {
     router: router,
-    callYahooUpdateSymbols: callYahooUpdateSymbols()
+    callYahooUpdateSymbols: callYahooUpdateSymbols
   }

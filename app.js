@@ -40,7 +40,7 @@ function stockFiveMinutes(){
   if(now != 'Saturday' && now != 'Sunday'){
     if(time > '09:30' && time < '16:00'){
       //Call yahoo api function
-      game.callYahooUpdateSymbols;
+      game.callYahooUpdateSymbols();
       console.log('called yahoo update');
     }
   }
