@@ -18,7 +18,7 @@ var moment = require('moment');
 var tz = require('moment-timezone');
 
 var currentGameDate = undefined;
-
+setInterval(stockFiveMinutes,300000);
 // Noah
 // call function to update currentGameDate in game.js
 
@@ -32,7 +32,7 @@ var currentGameDate = undefined;
 // setInterval() on callYahooUpdateSymbolsFiveMins every five minutes when
 // market is oepn and not closed EST times and gameDate is not Saturday
 // or a Sunday
-setInterval(stockFiveMinutes,300000);
+
 
 function stockFiveMinutes(){
   var now = moment().format('dddd');
@@ -42,6 +42,9 @@ function stockFiveMinutes(){
       //Call yahoo api function
       game.callYahooUpdateSymbols;
       console.log('called yahoo update');
+    }
+    if(time >= '16:00'){
+      game.endGameAndUpdateBalanceHistoryTable();
     }
   }
 }
