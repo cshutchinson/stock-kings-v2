@@ -36,15 +36,6 @@ function(token,tokenSecret,profile,done){
 
 ));
 
-<<<<<<< HEAD
-router.get('/google/callback',
-  passport.authenticate('google'),
-
-  function(req,res){
-    res.send('success');
-  }
-);
-=======
 router.get('/google/callback', function(req, res, next) {
   passport.authenticate('google', function(err, user, info){
     console.log('made it here 2')
@@ -66,7 +57,6 @@ router.get('/google/callback', function(req, res, next) {
   })(req, res, next);
 });
 
->>>>>>> e12fc00d107a0c97186867fc019f0f8762663147
 
 router.get('/google', passport.authenticate('google', { scope: 'profile'  }),
   function(req, res){

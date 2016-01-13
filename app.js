@@ -35,6 +35,7 @@ setInterval(stockFiveMinutes,300000);
 
 
 function stockFiveMinutes(){
+  currentGameDate = game.updateCurrentGameDate();
   var now = moment().format('dddd');
   var time = moment().tz('America/New_York').format('HH:mm');
   if(now != 'Saturday' && now != 'Sunday'){

@@ -149,7 +149,7 @@ function updateCurrentGameDate() {
   var time = moment().tz('America/New_York').format('HH:mm');
 
   if (time > '00:00' && time < '16:00') {
-    if (now != 'Saturday' && now != 'Sunday') {
+    if (day != 'Saturday' && day != 'Sunday') {
       return now
     }
   }
