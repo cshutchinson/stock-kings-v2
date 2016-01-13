@@ -167,9 +167,10 @@ function adjustUserCashBalance(userID, amount){
 
 function checkUserCashBuy(userID, transactionAmount){
   // check to see that user has enough cash execute buy order
-  knex('users').select('current_cash').where('id', userID).first()
+  return knex('users').select('current_cash').where('id', userID).first()
   .then(function(balance){
-    if (balance.current_cash<transactionAmount){
+    console.log('checkUserCashBuy', balance.current_cash, transactionAmount);
+    if (Number(balance.current_cash)<transactionAmount){
       return false;
     } else {
       return true;

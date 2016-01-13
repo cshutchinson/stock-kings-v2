@@ -1,37 +1,39 @@
 var express = require('express');
 var router = express.Router();
 var knex = require('../db/knex');
-
-router.get('/status', function(req, res){
-  // Chris
-  // get list of all user_ids in current day transactions
-
-    // for each user_id get symbol_id, qty, and retrieve current price
-    // generate total cash if all shares and sum (var=cashFromEquity)
-    // to this number add current cash from users table and subtract 10k
-    // results is profit / (loss) for each user each day
-
-    // return json object {user.id, user.firstName, user.lastName,
-    // and user.profit_loss }
-  knex('transactions')
-    .select(
-      'transactions.user_id',
-      'transactions.symbol_id,
-      'transactions.qty',
-      'shares.current_price',
-      'users.current_cash'
-    )
-    .innerJoin('symbols', 'symbols.id', 'transactions.symbol_id')
-    // innerjoin users
-    .innerJoin('users', )
-    .where('transactions.dateTime', '>=', new Date().toDateString)
-    // group by user_id
-    // agggregate sum by transactions.value
-    // new field = aggregated equity value + users.current_cash
+var rp = require('request-promise');
 
 
-
-});
+// router.get('/status', function(req, res){
+//   // Chris
+//   // get list of all user_ids in current day transactions
+//
+//     // for each user_id get symbol_id, qty, and retrieve current price
+//     // generate total cash if all shares and sum (var=cashFromEquity)
+//     // to this number add current cash from users table and subtract 10k
+//     // results is profit / (loss) for each user each day
+//
+//     // return json object {user.id, user.firstName, user.lastName,
+//     // and user.profit_loss }
+//   knex('transactions')
+//     .select(
+//       'transactions.user_id',
+//       'transactions.symbol_id',
+//       'transactions.qty',
+//       'shares.current_price',
+//       'users.current_cash'
+//     )
+//     .innerJoin('symbols', 'symbols.id', 'transactions.symbol_id')
+//     // innerjoin users
+//     .innerJoin('users', )
+//     .where('transactions.dateTime', '>=', new Date().toDateString)
+//     // group by user_id
+//     // agggregate sum by transactions.value
+//     // new field = aggregated equity value + users.current_cash
+//
+//
+//
+// });
 
 router.get('/end', function(req, res){
     // Chris
@@ -69,9 +71,69 @@ router.get('/counts', function(req, res){
 })
 
 // Chris
-function callYahooUpdateSymbolsFiveMins(){
+function callYahooUpdateSymbols(){
   // update symbols db with stock prices
+  var options = {
+      uri: 'http://finance.yahoo.com/webservice/v1/symbols/'+
+        // req.params.stock + '/quote',
+        getSymbolString() + '/quote',
+      qs: {
+          format: 'json'
+      },
+      headers: {
+          'User-Agent': 'Request-Promise'
+      },
+      json: true
+  };
+  rp(options)
+      .then(function (data) {
+         insertStockPricesDB(formatResponse(data));
+      })
+      .catch(function (err) {
+          res.send('Error retrieving stock price data on back end server');
+      });
 }
+
+function getSymbolString(){
+  return knex('symbols').select('symbol')
+  .then(function(symbols){
+    var symbolList = '';
+    symbols.forEach(function(symbol){
+      symbolList += symbol.symbol + ',';
+    });
+    return symbolList;
+  })
+}
+
+function formatResponse(stockData){
+  var stockPriceData =[];
+  stockData.list.resources.forEach(function(stock){
+    stockPriceData.push({
+      symbol: stock.resource.fields.symbol,
+      name: stock.resource.fields.name,
+      price: Number(stock.resource.fields.price).toFixed(2),
+      volume: stock.resource.fields.volume
+    })
+  })
+  return stockPriceData;
+}
+
+function insertStockPricesDB(stockDataArray){
+  var promiseArray = [];
+  return knex('symbols').then(function(){
+    stockDataArray.forEach(function(stock){
+      promiseArray.push(knex('symbols')
+      .where('symbol', stock.symbol)
+      .update({
+        current_price: stock.price,
+        volume: stock.volume
+      }))
+    });
+    return Promise.all(promiseArray);
+  });
+}
+
+
 // Chris
 function endGameAndUpdateBalanceHistoryTable(){
   // same logic for route /game/end which can be call by admin user on
@@ -88,4 +150,8 @@ function updateCurrentGameDate(){
 
 
 
-module.exports = router;
+module.exports =
+  {
+    router: router,
+    callYahooUpdateSymbols: callYahooUpdateSymbols()
+  }
