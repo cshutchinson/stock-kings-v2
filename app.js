@@ -17,7 +17,9 @@ var session = require('express-session');
 var moment = require('moment');
 var tz = require('moment-timezone');
 
-var currentGameDate = undefined;
+var state = require('./gamestate.js');
+
+
 setInterval(stockFiveMinutes,300000);
 // Noah
 // call function to update currentGameDate in game.js
@@ -35,7 +37,7 @@ setInterval(stockFiveMinutes,300000);
 
 
 function stockFiveMinutes(){
-  currentGameDate = game.updateCurrentGameDate();
+  state.currentGameDate = game.updateCurrentGameDate();
   var now = moment().format('dddd');
   var time = moment().tz('America/New_York').format('HH:mm');
   if(now != 'Saturday' && now != 'Sunday'){
