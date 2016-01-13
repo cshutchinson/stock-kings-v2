@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-
 var knex = require('../db/knex');
 
 var env = {
@@ -14,11 +13,8 @@ var env = {
 passport.use(new GoogleStrategy(
   env,
 function(token,tokenSecret,profile,done){
-  // done(null, profile,token);
-  // console.log(profile);
-  // console.log(profile._json.image.url);
-  console.log('made it here')
   var user = insertUser(profile);
+
   knex('users').select().where('oauthid', user.oauthid).first()
   .then(function(person){
     if(!person){
@@ -37,8 +33,18 @@ function(token,tokenSecret,profile,done){
       }
     })
   }
+
 ));
 
+<<<<<<< HEAD
+router.get('/google/callback',
+  passport.authenticate('google'),
+
+  function(req,res){
+    res.send('success');
+  }
+);
+=======
 router.get('/google/callback', function(req, res, next) {
   passport.authenticate('google', function(err, user, info){
     console.log('made it here 2')
@@ -60,11 +66,13 @@ router.get('/google/callback', function(req, res, next) {
   })(req, res, next);
 });
 
+>>>>>>> e12fc00d107a0c97186867fc019f0f8762663147
 
 router.get('/google', passport.authenticate('google', { scope: 'profile'  }),
   function(req, res){
     // The request will be redirected to Facebook for authentication, so this
     // function will not be called.
+
     console.log(req.user)
     res.end('success')
   });

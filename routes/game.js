@@ -143,9 +143,28 @@ function endGameAndUpdateBalanceHistoryTable(){
 }
 
 // Noah
-function updateCurrentGameDate(){
-  // be sure to export function
-  // logic no Saturday or Sunday dates
+function updateCurrentGameDate() {
+  var now = moment().format('MM/DD/YYYY');
+  var day = moment().format('dddd')
+  var time = moment().tz('America/New_York').format('HH:mm');
+
+  if (time > '00:00' && time < '16:00') {
+    if (now != 'Saturday' && now != 'Sunday') {
+      return now
+    }
+  }
+  if (time > '16:00' && day != 'Friday' && day != 'Saturday' && day != 'Sunday') {
+    return moment().add(1, 'days').format('MM/DD/YYYY')
+  }
+  if (time > '16:00' && day === 'Friday') {
+    return moment().add(3, 'days').format('MM/DD/YYYY')
+  }
+  if (day === 'Saturday') {
+    return moment().add(2, 'days').format('MM/DD/YYYY')
+  }
+  if (day === 'Sunday') {
+    return moment().add(1, 'days').format('MM/DD/YYYY')
+  }
 }
 
 
@@ -153,5 +172,7 @@ function updateCurrentGameDate(){
 module.exports =
   {
     router: router,
-    callYahooUpdateSymbols: callYahooUpdateSymbols
+    callYahooUpdateSymbols: callYahooUpdateSymbols,
+    updateCurrentGameDate:updateCurrentGameDate,
+    endGameAndUpdateBalanceHistoryTable:endGameAndUpdateBalanceHistoryTable
   }
