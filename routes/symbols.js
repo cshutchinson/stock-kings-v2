@@ -17,6 +17,13 @@ router.get('/prices', function(req, res){
   // stop calling yahoo api here instead let server call api
   // front end call this route to retrieve stock info from symbols
   // tab
+  console.log(req.user)
+  if(!req.isAuthenticated()){
+
+    res.end('Please Sign In')
+    return
+  }
+  console.log("You're in")
   knex('symbols').select('symbol').then(function(symbols){
     var symbolList = '';
     symbols.forEach(function(symbol){
