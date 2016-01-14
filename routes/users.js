@@ -3,8 +3,16 @@ var router = express.Router();
 var knex = require('../db/knex');
 var state = require('../gamestate.js');
 
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated())
+    return next();
+  else{
+    res.json({err: 'not authd'})
+  }
+}
 
-router.get('/portfolio/', function(req, res) {
+
+router.get('/portfolio/', ensureAuthenticated, function(req, res) {
   var transArray = [];
   knex('transactions')
     .select(
@@ -38,7 +46,7 @@ router.get('/portfolio/', function(req, res) {
     })
 })
 
-router.get('/balance',function(req,res){
+router.get('/balance',ensureAuthenticated,function(req,res){
   var ans = {};
   knex('users').where('id',req.user.id).first().
   then(function(user){
@@ -51,7 +59,7 @@ router.get('/balance',function(req,res){
 })
 });
 
-router.post('/buy', function(req,res){
+router.post('/buy', ensureAuthenticated, function(req,res){
   knex('symbols').select('symbol','current_price').where('symbol',req.body.symbol)
   .first()
   .then(function(stock){
@@ -81,7 +89,7 @@ router.post('/buy', function(req,res){
   })
 })
 
-router.post('/sell', function(req,res){
+router.post('/sell', ensureAuthenticated, function(req,res){
   knex('symbols').select('symbol','current_price').where('symbol',req.body.symbol)
   .first()
   .then(function(stock){
