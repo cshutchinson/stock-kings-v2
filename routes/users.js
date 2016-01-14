@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var knex = require('../db/knex');
+var state = require('../gamestate.js');
+
 
 router.get('/portfolio/:id/:date', function(req, res) {
   var transArray = [];
@@ -32,7 +34,6 @@ router.get('/portfolio/:id/:date', function(req, res) {
           value: (stock.cp*stock.qty).toFixed(2)
         })
       })
-      console.log(transArray);
       res.json(aggregateTransactions(transArray));
     })
 })
@@ -61,7 +62,7 @@ router.post('/buy', function(req,res){
         symbol_id:req.body.symbol_id,
         user_id:req.body.user_id,
         share_price:stock.current_price,
-        open_datetime:new Date(),
+        open_datetime: state.currentGameDate,
         qty:req.body.qty
       },'id').then(function(id){
         res.json({
@@ -93,7 +94,7 @@ router.post('/sell', function(req,res){
             symbol_id:req.body.symbol_id,
             user_id:req.body.user_id,
             share_price:stock.current_price,
-            open_datetime:new Date(),
+            open_datetime:state.currentGameDate,
             qty:-(req.body.qty)
           },'id')
           .then(function(id){
@@ -202,7 +203,7 @@ function checkPortfolioEquity(stockID, userID){
   // in current period to see if shares of this stock are owned
   return knex('transactions').select('qty', 'share_price')
     .where('symbol_id', stockID)
-    .andWhere('open_datetime', '>=', new Date().toDateString())
+    .andWhere('open_datetime', '>=', state.currentGameDate)
     .andWhere('user_id', userID)
     .then(function(results){
       var totalShares = 0;
