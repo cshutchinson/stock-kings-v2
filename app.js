@@ -20,7 +20,7 @@ var game = require('./routes/game');
 var state = require('./gamestate.js');
 
 state.currentGameDate = game.updateCurrentGameDate();
-setInterval(stockFiveMinutes,300000);
+setInterval(stockFiveMinutes,150000);
 // Noah
 // call function to update currentGameDate in game.js
 

@@ -18,7 +18,7 @@ router.get('/end', function(req, res){
     results.forEach(function(elem){
       writeBalanceHistory(elem).then(function(id){
         records.push(id[0]);
-        console.log(records);
+        // console.log(records);
         if (records.length === results.length){
           res.json({
             type: '/game/end',
@@ -81,7 +81,7 @@ function endGameAndUpdateBalanceHistoryTable(){
     results.forEach(function(elem){
       writeBalanceHistory(elem).then(function(id){
         records.push(id[0]);
-        console.log(records);
+        // console.log(records);
         if (records.length === results.length){
           return ({
             type: '/game/end',
@@ -172,25 +172,28 @@ function calcGameStandings(){
 
 function callYahooUpdateSymbols(){
   // update symbols db with stock prices
-  var options = {
-      uri: 'http://finance.yahoo.com/webservice/v1/symbols/'+
-        // req.params.stock + '/quote',
-        getSymbolString() + '/quote',
-      qs: {
-          format: 'json'
-      },
-      headers: {
-          'User-Agent': 'Request-Promise'
-      },
-      json: true
-  };
-  rp(options)
-      .then(function (data) {
-         insertStockPricesDB(formatResponse(data));
-      })
-      .catch(function (err) {
-          res.send('Error retrieving stock price data on back end server');
-      });
+  getSymbolString().then(function(symbolString){
+    var symbols = symbolString;
+    var options = {
+        uri: 'http://finance.yahoo.com/webservice/v1/symbols/'+
+          symbols + '/quote',
+        qs: {
+            format: 'json'
+        },
+        headers: {
+            'User-Agent': 'Request-Promise'
+        },
+        json: true
+    };
+    rp(options)
+        .then(function (data) {
+           insertStockPricesDB(formatResponse(data));
+        })
+        .catch(function (err) {
+            console.log('Error retrieving stock price data on back end server');
+        });
+  })
+
 }
 
 function getSymbolString(){
