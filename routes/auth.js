@@ -47,7 +47,7 @@ router.get('/google/callback', function(req, res, next) {
           next(err);
         } else {
           console.log('redirecting to client')
-          res.redirect(process.env.CLIENT_HOST+'/trade.html');
+          res.redirect(process.env.CLIENT_HOST+'trade.html');
         }
       });
     } else if (info) {
