@@ -20,6 +20,7 @@ var game = require('./routes/game');
 var state = require('./gamestate.js');
 
 state.currentGameDate = game.updateCurrentGameDate();
+
 setInterval(stockFiveMinutes,300000);
 
 function stockFiveMinutes(){

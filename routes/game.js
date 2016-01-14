@@ -18,7 +18,7 @@ router.get('/end', function(req, res){
     results.forEach(function(elem){
       writeBalanceHistory(elem).then(function(id){
         records.push(id[0]);
-        console.log(records);
+        // console.log(records);
         if (records.length === results.length){
           res.json({
             type: '/game/end',
@@ -32,37 +32,39 @@ router.get('/end', function(req, res){
 });
 
 router.get('/allTimeStats', function(req,res){
-  // Noah
-  // get list of all user_ids in balance_history
-
-  //SELECT first_name,SUM(cash_amount) FROM users JOIN balance_history ON
-  //users.id = balance_history.user_id group by first_name order by sum desc;
-
   knex.raw('SELECT first_name,last_name,profile_image_url,SUM(cash_amount) FROM users JOIN balance_history ON users.id = balance_history.user_id group by first_name order by sum desc;')
   .then(function(user){
     res.json(user['rows']);
   })
-    // for each user_id sum balance_history.cash_amount
-    // build array of objects {user.id, user.firstname, user.lastName,
-    // and user.profit_loss, }
-    // sort results by ascending profit_loss
-    // return sorted json object
-
-    // cool to store number of wins in users table
-
 });
 
 router.get('/counts', function(req, res){
-  // Chris
   // this route intended to be used to display following info on home page:
   // game in progress stats:
-  //      activeTraders: xxxx
-  //      sharesTradedToday: xxxx
-
-  // this small route can help add some statistics to home page about level
-  // of gameplay we are seeing :)
-
+  knex('transactions')
+  .select('user_id', 'qty')
+  .where('open_datetime', '>=', state.currentGameDate)
+  .then(function(results){
+    res.json(countUsersAndShares(results));
+  })
 })
+
+function countUsersAndShares(trans){
+  // counts users and shares in transaction for currentGameDate
+  var users = [];
+  var shares = 0;
+  trans.forEach(function(elem){
+    if(users.indexOf(elem.user_id)===-1){
+      users.push(elem.user_id);
+    }
+    shares += Math.abs(elem.qty);
+  })
+  return ({
+    type: 'current day counts',
+    active_users: users.length,
+    shares_traded: shares
+  })
+}
 
 function endGameAndUpdateBalanceHistoryTable(){
   // same logic for route /game/end which can be call by admin user on
@@ -72,7 +74,7 @@ function endGameAndUpdateBalanceHistoryTable(){
     results.forEach(function(elem){
       writeBalanceHistory(elem).then(function(id){
         records.push(id[0]);
-        console.log(records);
+        // console.log(records);
         if (records.length === results.length){
           return ({
             type: '/game/end',
@@ -163,28 +165,28 @@ function calcGameStandings(){
 
 function callYahooUpdateSymbols(){
   // update symbols db with stock prices
-  //  getSymbolString()
-  var options = {
-      uri: 'http://finance.yahoo.com/webservice/v1/symbols/'+
-        // req.params.stock + '/quote',
-      'aapl' + '/quote?format=json&view=detail',
-      qs: {
-          format: 'json'
-      },
-      headers: {
-          'User-Agent': 'Request-Promise'
-      },
-      json: true
-  };
-  // console.log(options.uri);
-  rp(options.uri)
-      .then(function (data) {
-          console.log(data);
-         insertStockPricesDB(formatResponse(data));
-      })
-      .catch(function (err) {
-          res.send('Error retrieving stock price data on back end server');
-      });
+  getSymbolString().then(function(symbolString){
+    var symbols = symbolString;
+    var options = {
+        uri: 'http://finance.yahoo.com/webservice/v1/symbols/'+
+          symbols + '/quote',
+        qs: {
+            format: 'json'
+        },
+        headers: {
+            'User-Agent': 'Request-Promise'
+        },
+        json: true
+    };
+    rp(options)
+        .then(function (data) {
+           insertStockPricesDB(formatResponse(data));
+        })
+        .catch(function (err) {
+            console.log('Error retrieving stock price data on back end server');
+        });
+  })
+
 }
 
 function getSymbolString(){
