@@ -21,20 +21,6 @@ var state = require('./gamestate.js');
 
 state.currentGameDate = game.updateCurrentGameDate();
 setInterval(stockFiveMinutes,300000);
-// Noah
-// call function to update currentGameDate in game.js
-
-// Noah blocked on Chris writting function
-// setInterval() on endGameAndUpdateBalanceHistoryTable() in game.js at 4pm
-
-// Noah
-// setInterval() on updateCurrentGameDate in game.js at 4pm
-
-// Noah
-// setInterval() on callYahooUpdateSymbolsFiveMins every five minutes when
-// market is oepn and not closed EST times and gameDate is not Saturday
-// or a Sunday
-
 
 function stockFiveMinutes(){
   state.currentGameDate = game.updateCurrentGameDate();
