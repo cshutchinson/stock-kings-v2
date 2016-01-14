@@ -7,72 +7,28 @@ var moment = require('moment');
 var tz = require('moment-timezone');
 
 router.get('/status', function(req, res){
-  // get list of all user_ids in current day transactions
-  // for each user_id get symbol_id, qty, and retrieve current price
-  // generate total cash if all shares and sum (var=cashFromEquity)
-  // to this number add current cash from users table and subtract 10k
-  // results is profit / (loss) for each user each day
-  // return json object {user.id, user.firstName, user.lastName,
-  // and user.profit_loss }
-  knex('transactions')
-    .select(
-      'transactions.user_id',
-      'transactions.symbol_id',
-      'transactions.qty',
-      'symbols.current_price',
-      'users.current_cash',
-      'users.first_name',
-      'users.last_name'
-    )
-    .innerJoin('symbols', 'symbols.id', 'transactions.symbol_id')
-    .innerJoin('users', 'users.id', 'transactions.user_id')
-    .where('transactions.open_datetime', '>=', state.currentGameDate)
-    .orderBy('transactions.user_id')
-    .then(function(results){
-      var standings = [];
-      var ec = [];
-      var profitLoss = [];
-      results.forEach(function(elem){
-        if((standings.length===0) ||
-          (standings[standings.length-1].user_id!==elem.user_id)){
-          standings.push({
-            user_id: elem.user_id,
-            first_name: elem.first_name,
-            last_name: elem.last_name,
-            cash: elem.current_cash,
-            profit_loss: elem.qty*elem.current_price
-          })
-        } else {
-          standings[standings.length-1].profit_loss +=
-            (elem.qty*elem.current_price);
-        }
-      })
-      standings.forEach(function(elem){
-        profitLoss.push({
-          user_id: elem.user_id,
-          first_name: elem.first_name,
-          last_name: elem.last_name,
-          profit_loss: elem.cash + elem.profit_loss -10000,
-          gameDate: state.currentGameDate
-        })
-      })
-      profitLoss.sort(function(a,b){
-        if (a.profit_loss > b.profit_loss) return -1;
-        if (a.profit_loss < b.profit_loss) return 1;
-        return 0;
-      })
-
-      res.json(profitLoss);
-    })
+  calcGameStandings().then(function(results){
+    res.json(results);
+  })
 });
 
 router.get('/end', function(req, res){
-    // Chris
-    // do same things as /status route, but write results to
-    // balance_history table (game has ended for day)
-
-    // update user table with winner and increment wins
-    // user.wins
+  var records=[];
+  calcGameStandings().then(function(results){
+    results.forEach(function(elem){
+      writeBalanceHistory(elem).then(function(id){
+        records.push(id[0]);
+        console.log(records);
+        if (records.length === results.length){
+          res.json({
+            type: '/game/end',
+            success: true,
+            balance_history_ids: records
+          });
+        }
+      })
+    })
+  })
 });
 
 router.get('/allTimeStats', function(req,res){
@@ -100,6 +56,103 @@ router.get('/counts', function(req, res){
   // of gameplay we are seeing :)
 
 })
+
+function endGameAndUpdateBalanceHistoryTable(){
+  // same logic for route /game/end which can be call by admin user on
+  // front end
+  var records = [];
+  calcGameStandings().then(function(results){
+    results.forEach(function(elem){
+      writeBalanceHistory(elem).then(function(id){
+        records.push(id[0]);
+        console.log(records);
+        if (records.length === results.length){
+          return ({
+            type: '/game/end',
+            success: true,
+            balance_history_ids: records
+          });
+        }
+      })
+    })
+  })
+}
+
+
+function writeBalanceHistory(player){
+    // write results to balance_history table (game has ended for day)
+    // update user table with winner and increment wins user.wins
+    return knex('balance_history').insert({
+      user_id: player.user_id,
+      date: player.game_date,
+      cash_amount: player.profit_loss
+      }, 'id')
+    .then(function(id){
+      return id;
+    })
+}
+
+function calcGameStandings(){
+  // get list of all user_ids in current day transactions
+  // for each user_id get symbol_id, qty, and retrieve current price
+  // generate total cash if all shares and sum (var=cashFromEquity)
+  // to this number add current cash from users table and subtract 10k
+  // results is profit / (loss) for each user each day
+  // return json object {user.id, user.firstName, user.lastName,
+  // and user.profit_loss }
+  return knex('transactions')
+    .select(
+      'transactions.user_id',
+      'transactions.symbol_id',
+      'transactions.qty',
+      'transactions.open_datetime',
+      'symbols.current_price',
+      'users.current_cash',
+      'users.first_name',
+      'users.last_name'
+    )
+    .innerJoin('symbols', 'symbols.id', 'transactions.symbol_id')
+    .innerJoin('users', 'users.id', 'transactions.user_id')
+    .where('transactions.open_datetime', '>=', state.currentGameDate)
+    .orderBy('transactions.user_id')
+    .then(function(results){
+      var standings = [];
+      var ec = [];
+      var profitLoss = [];
+      results.forEach(function(elem){
+        if((standings.length===0) ||
+          (standings[standings.length-1].user_id!==elem.user_id)){
+          standings.push({
+            user_id: elem.user_id,
+            game_date: elem.open_datetime,
+            first_name: elem.first_name,
+            last_name: elem.last_name,
+            cash: elem.current_cash,
+            profit_loss: elem.qty*elem.current_price
+          })
+        } else {
+          standings[standings.length-1].profit_loss +=
+            (elem.qty*elem.current_price);
+        }
+      })
+      standings.forEach(function(elem){
+        profitLoss.push({
+          user_id: elem.user_id,
+          game_date: elem.game_date,
+          first_name: elem.first_name,
+          last_name: elem.last_name,
+          profit_loss: elem.cash + elem.profit_loss -10000
+        })
+      })
+      profitLoss.sort(function(a,b){
+        if (a.profit_loss > b.profit_loss) return -1;
+        if (a.profit_loss < b.profit_loss) return 1;
+        return 0;
+      })
+
+      return profitLoss;
+    })
+}
 
 function callYahooUpdateSymbols(){
   // update symbols db with stock prices
@@ -163,16 +216,6 @@ function insertStockPricesDB(stockDataArray){
   });
 }
 
-
-// Chris
-function endGameAndUpdateBalanceHistoryTable(){
-  // same logic for route /game/end which can be call by admin user on
-  // front end
-
-  // call the update updateCurrentGameDate function()
-}
-
-// Noah
 function updateCurrentGameDate() {
 
   var now = moment().tz('America/New_York').format('MM/DD/YYYY');
