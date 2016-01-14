@@ -10,16 +10,16 @@ var cors = require('cors')
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var symbols = require('./routes/symbols');
-var game = require('./routes/game');
 
 var auth = require('./routes/auth');
 var session = require('express-session');
 var moment = require('moment');
 var tz = require('moment-timezone');
+var game = require('./routes/game');
 
 var state = require('./gamestate.js');
 
-
+state.currentGameDate = game.updateCurrentGameDate();
 setInterval(stockFiveMinutes,300000);
 // Noah
 // call function to update currentGameDate in game.js
@@ -38,12 +38,13 @@ setInterval(stockFiveMinutes,300000);
 
 function stockFiveMinutes(){
   state.currentGameDate = game.updateCurrentGameDate();
+  console.log('currentGameDate', state.currentGameDate);
   var now = moment().format('dddd');
   var time = moment().tz('America/New_York').format('HH:mm');
   if(now != 'Saturday' && now != 'Sunday'){
     if(time > '09:30' && time < '16:00'){
       //Call yahoo api function
-      game.callYahooUpdateSymbols;
+      game.callYahooUpdateSymbols();
       console.log('called yahoo update');
     }
     if(time >= '16:00'){
@@ -60,7 +61,7 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+app.use(logger('tiny'));
 app.use(cors({
   //TODO change origin once deployed
   origin: 'https://stock-kings.firebaseapp.com',
