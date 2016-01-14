@@ -46,16 +46,32 @@ router.get('/allTimeStats', function(req,res){
 });
 
 router.get('/counts', function(req, res){
-  // Chris
   // this route intended to be used to display following info on home page:
   // game in progress stats:
-  //      activeTraders: xxxx
-  //      sharesTradedToday: xxxx
-
-  // this small route can help add some statistics to home page about level
-  // of gameplay we are seeing :)
-
+  knex('transactions')
+  .select('user_id', 'qty')
+  .where('open_datetime', '>=', state.currentGameDate)
+  .then(function(results){
+    res.json(countUsersAndShares(results));
+  })
 })
+
+function countUsersAndShares(trans){
+  // counts users and shares in transaction for currentGameDate
+  var users = [];
+  var shares = 0;
+  trans.forEach(function(elem){
+    if(users.indexOf(elem.user_id)===-1){
+      users.push(elem.user_id);
+    }
+    shares += Math.abs(elem.qty);
+  })
+  return ({
+    type: 'current day counts',
+    active_users: users.length,
+    shares_traded: shares
+  })
+}
 
 function endGameAndUpdateBalanceHistoryTable(){
   // same logic for route /game/end which can be call by admin user on
