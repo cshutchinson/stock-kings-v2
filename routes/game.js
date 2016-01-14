@@ -10,33 +10,60 @@ var state = require('../gamestate.js');
 
 
 router.get('/status', function(req, res){
-  // Chris
   // get list of all user_ids in current day transactions
-
-    // for each user_id get symbol_id, qty, and retrieve current price
-    // generate total cash if all shares and sum (var=cashFromEquity)
-    // to this number add current cash from users table and subtract 10k
-    // results is profit / (loss) for each user each day
-
-    // return json object {user.id, user.firstName, user.lastName,
-    // and user.profit_loss }
+  // for each user_id get symbol_id, qty, and retrieve current price
+  // generate total cash if all shares and sum (var=cashFromEquity)
+  // to this number add current cash from users table and subtract 10k
+  // results is profit / (loss) for each user each day
+  // return json object {user.id, user.firstName, user.lastName,
+  // and user.profit_loss }
   knex('transactions')
-    // .distinct('transactions.user_id')
     .select(
       'transactions.user_id',
       'transactions.symbol_id',
       'transactions.qty',
       'symbols.current_price',
-      'users.current_cash'
+      'users.current_cash',
+      'users.first_name',
+      'users.last_name'
     )
     .innerJoin('symbols', 'symbols.id', 'transactions.symbol_id')
     .innerJoin('users', 'users.id', 'transactions.user_id')
     .where('transactions.open_datetime', '>=', state.currentGameDate)
     .orderBy('transactions.user_id')
-    // .groupBy('transactions.user_id', 'transactions.symbol_id', 'transactions.qty',
-    //   'symbols.current_price', 'users.current_cash')
     .then(function(results){
-      res.json(results);
+      var standings = [];
+      var ec = [];
+      var profitLoss = [];
+      results.forEach(function(elem){
+        if((standings.length===0) ||
+          (standings[standings.length-1].user_id!==elem.user_id)){
+          standings.push({
+            user_id: elem.user_id,
+            first_name: elem.first_name,
+            last_name: elem.last_name,
+            cash: elem.current_cash,
+            profit_loss: elem.qty*elem.current_price
+          })
+        } else {
+          standings[standings.length-1].profit_loss +=
+            (elem.qty*elem.current_price);
+        }
+      })
+      standings.forEach(function(elem){
+        profitLoss.push({
+          user_id: elem.user_id,
+          first_name: elem.first_name,
+          last_name: elem.last_name,
+          profit_loss: elem.cash + elem.profit_loss -10000
+        })
+      })
+      profitLoss.sort(function(a,b){
+        if (a.profit_loss > b.profit_loss) return -1;
+        if (a.profit_loss < b.profit_loss) return 1;
+        return 0;
+      })
+      res.json(profitLoss);
     })
 });
 
