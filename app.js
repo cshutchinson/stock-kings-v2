@@ -51,7 +51,8 @@ app.set('view engine', 'jade');
 app.use(logger('tiny'));
 app.use(cors({
   //TODO change origin once deployed
-  origin: 'https://stock-kings.firebaseapp.com',
+  origin: process.env.CLIENT_HOST,
+  // 'https://stock-kings.firebaseapp.com',
   methods: ['GET', 'PUT', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
