@@ -18,7 +18,6 @@ router.get('/end', function(req, res){
     results.forEach(function(elem){
       writeBalanceHistory(elem).then(function(id){
         records.push(id[0]);
-        // console.log(records);
         if (records.length === results.length){
           res.json({
             type: '/game/end',
@@ -74,7 +73,6 @@ function endGameAndUpdateBalanceHistoryTable(){
     results.forEach(function(elem){
       writeBalanceHistory(elem).then(function(id){
         records.push(id[0]);
-        // console.log(records);
         if (records.length === results.length){
           return ({
             type: '/game/end',
@@ -196,7 +194,6 @@ function getSymbolString(){
     symbols.forEach(function(symbol){
       symbolList += symbol.symbol + ',';
     });
-    console.log(symbolList);
     return symbolList;
   })
 }

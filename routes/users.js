@@ -3,8 +3,16 @@ var router = express.Router();
 var knex = require('../db/knex');
 var state = require('../gamestate.js');
 
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated())
+    return next();
+  else{
+    res.json({err: 'not authd'})
+  }
+}
 
-router.get('/portfolio/:id/:date', function(req, res) {
+
+router.get('/portfolio/', ensureAuthenticated, function(req, res) {
   var transArray = [];
   knex('transactions')
     .select(
@@ -16,8 +24,8 @@ router.get('/portfolio/:id/:date', function(req, res) {
       'symbols.current_price as cp'
     )
     .innerJoin('symbols', 'symbols.id', 'transactions.symbol_id')
-    .where('transactions.user_id', req.params.id)
-    .andWhere('transactions.open_datetime','>=', req.params.date)
+    .where('transactions.user_id', req.user.id)
+    .andWhere('transactions.open_datetime','>=', state.currentGameDate)
     .orderBy('transactions.open_datetime', 'asc')
     .then(function(results){
 
@@ -38,9 +46,9 @@ router.get('/portfolio/:id/:date', function(req, res) {
     })
 })
 
-router.get('/balance/:id',function(req,res){
+router.get('/balance',ensureAuthenticated,function(req,res){
   var ans = {};
-  knex('users').where('id',req.params.id).first().
+  knex('users').where('id',req.user.id).first().
   then(function(user){
     ans = {
       first_name:user.first_name,
@@ -51,16 +59,16 @@ router.get('/balance/:id',function(req,res){
 })
 });
 
-router.post('/buy', function(req,res){
-  knex('symbols').select('symbol','current_price').where('id',req.body.symbol_id)
+router.post('/buy', ensureAuthenticated, function(req,res){
+  knex('symbols').select('symbol','current_price').where('symbol',req.body.symbol)
   .first()
   .then(function(stock){
     var proceeds = req.body.qty*stock.current_price;
-    if(checkUserCashBuy(req.body.user_id, Math.abs(proceeds))){
-      adjustUserCashBalance(req.body.user_id, -proceeds);
+    if(checkUserCashBuy(req.user.id, Math.abs(proceeds))){
+      adjustUserCashBalance(req.user.id, -proceeds);
       knex('transactions').insert({
         symbol_id:req.body.symbol_id,
-        user_id:req.body.user_id,
+        user_id:req.user.id,
         share_price:stock.current_price,
         open_datetime: state.currentGameDate,
         qty:req.body.qty
@@ -81,18 +89,18 @@ router.post('/buy', function(req,res){
   })
 })
 
-router.post('/sell', function(req,res){
-  knex('symbols').select('symbol','current_price').where('id',req.body.symbol_id)
+router.post('/sell', ensureAuthenticated, function(req,res){
+  knex('symbols').select('symbol','current_price').where('symbol',req.body.symbol)
   .first()
   .then(function(stock){
     var proceeds = req.body.qty*stock.current_price;
-    checkForShortSale(req.body.user_id, req.body.symbol_id, Math.abs(proceeds))
+    checkForShortSale(req.user.id, req.body.symbol_id, Math.abs(proceeds))
       .then(function(result){
         if(result){
-          adjustUserCashBalance(req.body.user_id, proceeds);
+          adjustUserCashBalance(req.user.id, proceeds);
           knex('transactions').insert({
             symbol_id:req.body.symbol_id,
-            user_id:req.body.user_id,
+            user_id:req.user.id,
             share_price:stock.current_price,
             open_datetime:state.currentGameDate,
             qty:-(req.body.qty)
