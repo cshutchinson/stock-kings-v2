@@ -163,10 +163,11 @@ function calcGameStandings(){
 
 function callYahooUpdateSymbols(){
   // update symbols db with stock prices
+  //  getSymbolString()
   var options = {
       uri: 'http://finance.yahoo.com/webservice/v1/symbols/'+
         // req.params.stock + '/quote',
-        getSymbolString() + '/quote',
+      'aapl' + '/quote?format=json&view=detail',
       qs: {
           format: 'json'
       },
@@ -175,8 +176,10 @@ function callYahooUpdateSymbols(){
       },
       json: true
   };
-  rp(options)
+  // console.log(options.uri);
+  rp(options.uri)
       .then(function (data) {
+          console.log(data);
          insertStockPricesDB(formatResponse(data));
       })
       .catch(function (err) {
@@ -191,6 +194,7 @@ function getSymbolString(){
     symbols.forEach(function(symbol){
       symbolList += symbol.symbol + ',';
     });
+    console.log(symbolList);
     return symbolList;
   })
 }
