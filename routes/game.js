@@ -49,6 +49,13 @@ router.get('/allTimeStats', function(req,res){
   // Noah
   // get list of all user_ids in balance_history
 
+  //SELECT first_name,SUM(cash_amount) FROM users JOIN balance_history ON
+  //users.id = balance_history.user_id group by first_name order by sum desc;
+
+  knex.raw('SELECT first_name,last_name,profile_image_url,SUM(cash_amount) FROM users JOIN balance_history ON users.id = balance_history.user_id group by first_name order by sum desc;')
+  .then(function(user){
+    res.json(user['rows']);
+  })
     // for each user_id sum balance_history.cash_amount
     // build array of objects {user.id, user.firstname, user.lastName,
     // and user.profit_loss, }
