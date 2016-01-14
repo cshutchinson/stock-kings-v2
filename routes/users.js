@@ -4,7 +4,7 @@ var knex = require('../db/knex');
 var state = require('../gamestate.js');
 
 
-router.get('/portfolio/:id/:date', function(req, res) {
+router.get('/portfolio/', function(req, res) {
   var transArray = [];
   knex('transactions')
     .select(
@@ -16,8 +16,8 @@ router.get('/portfolio/:id/:date', function(req, res) {
       'symbols.current_price as cp'
     )
     .innerJoin('symbols', 'symbols.id', 'transactions.symbol_id')
-    .where('transactions.user_id', req.params.id)
-    .andWhere('transactions.open_datetime','>=', req.params.date)
+    .where('transactions.user_id', req.user.id)
+    .andWhere('transactions.open_datetime','>=', state.currentGameDate)
     .orderBy('transactions.open_datetime', 'asc')
     .then(function(results){
 
