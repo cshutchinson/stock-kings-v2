@@ -23,6 +23,7 @@ state.currentGameDate = game.updateCurrentGameDate();
 
 setInterval(stockFiveMinutes,300000);
 
+
 function stockFiveMinutes(){
   state.currentGameDate = game.updateCurrentGameDate();
   console.log('currentGameDate', state.currentGameDate);
@@ -74,10 +75,13 @@ app.use(auth.passport.initialize());
 app.use(auth.passport.session());
 
 auth.passport.serializeUser(function(user, done) {
+  console.log('serializing user');
   done(null, user);
 });
 
 auth.passport.deserializeUser(function(user, done) {
+  console.log('deserializing user');
+  console.log(user);
   done(null, user);
 });
 
