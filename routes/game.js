@@ -2,6 +2,11 @@ var express = require('express');
 var router = express.Router();
 var knex = require('../db/knex');
 var rp = require('request-promise');
+var state = require('../gamestate.js');
+var moment = require('moment');
+var tz = require('moment-timezone');
+var state = require('../gamestate.js');
+
 
 
 router.get('/status', function(req, res){
@@ -16,19 +21,21 @@ router.get('/status', function(req, res){
     // return json object {user.id, user.firstName, user.lastName,
     // and user.profit_loss }
   knex('transactions')
+    // .distinct('transactions.user_id')
     .select(
       'transactions.user_id',
       'transactions.symbol_id',
       'transactions.qty',
-      'shares.current_price',
+      'symbols.current_price',
       'users.current_cash'
     )
     .innerJoin('symbols', 'symbols.id', 'transactions.symbol_id')
     .innerJoin('users', 'users.id', 'transactions.user_id')
-    .where('transactions.dateTime', '>=', state.currentGameDate)
-    .groupBy('transactions.user_id')
+    .where('transactions.open_datetime', '>=', state.currentGameDate)
+    .orderBy('transactions.user_id')
+    // .groupBy('transactions.user_id', 'transactions.symbol_id', 'transactions.qty',
+    //   'symbols.current_price', 'users.current_cash')
     .then(function(results){
-      console.log('status', results);
       res.json(results);
     })
 });
@@ -68,7 +75,6 @@ router.get('/counts', function(req, res){
 
 })
 
-// Chris
 function callYahooUpdateSymbols(){
   // update symbols db with stock prices
   var options = {
@@ -142,6 +148,7 @@ function endGameAndUpdateBalanceHistoryTable(){
 
 // Noah
 function updateCurrentGameDate() {
+
   var now = moment().format('MM/DD/YYYY');
   var day = moment().format('dddd')
   var time = moment().tz('America/New_York').format('HH:mm');
@@ -163,6 +170,7 @@ function updateCurrentGameDate() {
   if (day === 'Sunday') {
     return moment().add(1, 'days').format('MM/DD/YYYY')
   }
+
 }
 
 
