@@ -62,7 +62,6 @@ router.get('/status', function(req, res){
         return 0;
       })
 
-      console.log(standings, profitLoss);
       res.json(profitLoss);
     })
 });
