@@ -10,12 +10,12 @@ var cors = require('cors')
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var symbols = require('./routes/symbols');
-var game = require('./routes/game');
 
 var auth = require('./routes/auth');
 var session = require('express-session');
 var moment = require('moment');
 var tz = require('moment-timezone');
+var game = require('./routes/game');
 
 var state = require('./gamestate.js');
 
@@ -64,7 +64,7 @@ app.set('view engine', 'jade');
 app.use(logger('tiny'));
 app.use(cors({
   //TODO change origin once deployed
-  origin: 'http://localhost:8080',
+  origin: 'https://stock-kings.firebaseapp.com',
   methods: ['GET', 'PUT', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,

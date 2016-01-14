@@ -22,7 +22,7 @@ passport.use(new GoogleStrategy(
             first_name: user.first_name,
             last_name: user.last_name,
             oauthid: user.oauthid,
-            profile_image_url: user.profile_img_url
+            profile_image_url: user.profile_image_url
           }, 'id').then(function(id) {
             user.id = id[0];
             done(null, user);
@@ -47,7 +47,7 @@ router.get('/google/callback', function(req, res, next) {
           next(err);
         } else {
           console.log('redirecting to client')
-          res.redirect(process.env.CLIENT_HOST);
+          res.redirect(process.env.CLIENT_HOST+'trade.html');
         }
       });
     } else if (info) {

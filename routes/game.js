@@ -5,9 +5,6 @@ var rp = require('request-promise');
 var state = require('../gamestate.js');
 var moment = require('moment');
 var tz = require('moment-timezone');
-var state = require('../gamestate.js');
-
-
 
 router.get('/status', function(req, res){
   // get list of all user_ids in current day transactions
@@ -55,7 +52,8 @@ router.get('/status', function(req, res){
           user_id: elem.user_id,
           first_name: elem.first_name,
           last_name: elem.last_name,
-          profit_loss: elem.cash + elem.profit_loss -10000
+          profit_loss: elem.cash + elem.profit_loss -10000,
+          gameDate: state.currentGameDate
         })
       })
       profitLoss.sort(function(a,b){
@@ -63,6 +61,8 @@ router.get('/status', function(req, res){
         if (a.profit_loss < b.profit_loss) return 1;
         return 0;
       })
+
+      console.log(standings, profitLoss);
       res.json(profitLoss);
     })
 });
@@ -176,8 +176,8 @@ function endGameAndUpdateBalanceHistoryTable(){
 // Noah
 function updateCurrentGameDate() {
 
-  var now = moment().format('MM/DD/YYYY');
-  var day = moment().format('dddd')
+  var now = moment().tz('America/New_York').format('MM/DD/YYYY');
+  var day = moment().tz('America/New_York').format('dddd')
   var time = moment().tz('America/New_York').format('HH:mm');
 
   if (time > '00:00' && time < '16:00') {
