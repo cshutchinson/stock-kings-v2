@@ -23,6 +23,7 @@ state.currentGameDate = game.updateCurrentGameDate();
 
 setInterval(stockFiveMinutes,300000);
 
+
 function stockFiveMinutes(){
   state.currentGameDate = game.updateCurrentGameDate();
   console.log('currentGameDate', state.currentGameDate);
@@ -51,7 +52,8 @@ app.set('view engine', 'jade');
 app.use(logger('tiny'));
 app.use(cors({
   //TODO change origin once deployed
-  origin: 'https://stock-kings.firebaseapp.com',
+  origin: process.env.CLIENT_HOST,
+  // 'https://stock-kings.firebaseapp.com',
   methods: ['GET', 'PUT', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -73,10 +75,13 @@ app.use(auth.passport.initialize());
 app.use(auth.passport.session());
 
 auth.passport.serializeUser(function(user, done) {
+  console.log('serializing user');
   done(null, user);
 });
 
 auth.passport.deserializeUser(function(user, done) {
+  console.log('deserializing user');
+  console.log(user);
   done(null, user);
 });
 

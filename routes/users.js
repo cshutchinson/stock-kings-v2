@@ -7,7 +7,7 @@ function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated() && req.user)
     return next();
   else{
-    res.json({err: 'not authd'})
+    res.redirect(process.env.CLIENT_HOST);
   }
 }
 
@@ -59,33 +59,43 @@ router.get('/balance',ensureAuthenticated,function(req,res){
 })
 });
 
-router.post('/buy', ensureAuthenticated, function(req,res){
-  knex('symbols').select('symbol','current_price').where('symbol',req.body.symbol)
+router.post('/buy',ensureAuthenticated, function(req,res){
+  //ensureAuthenticated,
+  console.log(req.body);
+  console.log(req.user);
+
+  knex('symbols').select('symbol','current_price','id').where('symbol',req.body.symbol)
   .first()
   .then(function(stock){
     var proceeds = req.body.qty*stock.current_price;
-    if(checkUserCashBuy(req.user.id, Math.abs(proceeds))){
-      adjustUserCashBalance(req.user.id, -proceeds);
-      knex('transactions').insert({
-        symbol_id:req.body.symbol_id,
-        user_id:req.user.id,
-        share_price:stock.current_price,
-        open_datetime: state.currentGameDate,
-        qty:req.body.qty
-      },'id').then(function(id){
+
+    checkUserCashBuy(req.user.id, Math.abs(proceeds)).then(function(result){
+      if(result)
+      {
+        adjustUserCashBalance(req.user.id, -proceeds);
+        knex('transactions').insert({
+          symbol_id:stock.id,
+          user_id:req.user.id,
+          share_price:stock.current_price,
+          open_datetime: state.currentGameDate,
+          qty:req.body.qty
+        },'id').then(function(id){
+          res.json({
+            type: 'buy',
+            success: true,
+            transactionID: id
+          });
+        })
+      } else {
         res.json({
           type: 'buy',
-          success: true,
-          transactionID: id
+          success: false,
+          reason: 'exceeds available cash'
         });
-      })
-    } else {
-      res.json({
-        type: 'buy',
-        success: false,
-        reason: 'exceeds available cash'
-      });
-    }
+      }
+    }).catch(function(err){
+      console.log(err);
+    })
   })
 })
 
@@ -180,8 +190,7 @@ function checkUserCashBuy(userID, transactionAmount){
   // check to see that user has enough cash execute buy order
   return knex('users').select('current_cash').where('id', userID).first()
   .then(function(balance){
-    console.log('checkUserCashBuy', balance.current_cash, transactionAmount);
-    if (Number(balance.current_cash)<transactionAmount){
+    if (balance.current_cash< transactionAmount || balance.current_cash == null){
       return false;
     } else {
       return true;
