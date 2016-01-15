@@ -22,7 +22,8 @@ passport.use(new GoogleStrategy(
             first_name: user.first_name,
             last_name: user.last_name,
             oauthid: user.oauthid,
-            profile_image_url: user.profile_image_url
+            profile_image_url: user.profile_image_url,
+            current_cash: 10000
           }, 'id').then(function(id) {
             user.id = id[0];
             done(null, user);
