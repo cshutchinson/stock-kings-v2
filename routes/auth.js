@@ -78,7 +78,7 @@ function insertUser(profile) {
     first_name: profile._json.name.givenName,
     last_name: profile._json.name.familyName,
     profile_image_url: profile._json.image.url,
-    oauthid: profile._json.id
+    oauthid: profile._json.id,
     current_cash: 10000
   };
   return user;
