@@ -60,7 +60,6 @@ router.get('/balance',ensureAuthenticated,function(req,res){
 });
 
 router.post('/buy',ensureAuthenticated, function(req,res){
-  //ensureAuthenticated,
   console.log(req.body);
   console.log(req.user);
 
@@ -132,6 +131,18 @@ router.post('/sell', ensureAuthenticated, function(req,res){
       })
   })
 })
+
+router.get('/balancehistory', ensureAuthenticated, function(req, res){
+  knex('balance_history').select('date', 'cash_amount')
+  .where('user_id', req.user.id)
+  .orderBy('date', 'asc')
+  .then(function(record){
+    res.json(record);
+  })
+});
+
+
+
 
 function aggregateTransactions(transArray){
   // when user portfolio is show group portfolio by stock and price is
