@@ -4,10 +4,15 @@ var knex = require('../db/knex');
 var state = require('../gamestate.js');
 
 function ensureAuthenticated(req, res, next) {
+  console.log(req.user);
   if (req.isAuthenticated() && req.user)
     return next();
   else{
-    res.redirect(process.env.CLIENT_HOST);
+    res.status(401);
+    res.json({
+      unauthorized:true
+    })
+
   }
 }
 
@@ -99,16 +104,19 @@ router.post('/buy',ensureAuthenticated, function(req,res){
 })
 
 router.post('/sell', ensureAuthenticated, function(req,res){
-  knex('symbols').select('symbol','current_price').where('symbol',req.body.symbol)
+
+  console.log(req.user);
+
+  knex('symbols').select('symbol','current_price','id').where('symbol',req.body.symbol)
   .first()
   .then(function(stock){
     var proceeds = req.body.qty*stock.current_price;
-    checkForShortSale(req.user.id, req.body.symbol_id, Math.abs(proceeds))
+    checkForShortSale(req.user.id, stock.id, Math.abs(proceeds))
       .then(function(result){
         if(result){
           adjustUserCashBalance(req.user.id, proceeds);
           knex('transactions').insert({
-            symbol_id:req.body.symbol_id,
+            symbol_id:stock.id,
             user_id:req.user.id,
             share_price:stock.current_price,
             open_datetime:state.currentGameDate,
@@ -140,8 +148,6 @@ router.get('/balancehistory', ensureAuthenticated, function(req, res){
     res.json(record);
   })
 });
-
-
 
 
 function aggregateTransactions(transArray){
@@ -215,6 +221,8 @@ function checkForShortSale(userID, stockID, transactionAmount){
   // other stocks as their values could go to zero; we are a no risk
   // application :)
   return checkPortfolioEquity(stockID, userID).then(function(cpe){
+    console.log(cpe);
+    console.log(transactionAmount);
     return getUserCash(userID).then(function(guc){
       console.log('checkForShortSale', guc, cpe, transactionAmount);
       if ((guc + cpe) > transactionAmount){
@@ -227,6 +235,8 @@ function checkForShortSale(userID, stockID, transactionAmount){
 }
 
 function checkPortfolioEquity(stockID, userID){
+  console.log('StockID = '+stockID);
+  console.log('userID = '+userID);
   // does user currently own a stock, function looks at all transactions
   // in current period to see if shares of this stock are owned
   return knex('transactions').select('qty', 'share_price')
