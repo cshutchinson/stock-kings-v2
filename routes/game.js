@@ -30,8 +30,8 @@ router.get('/end', function(req, res){
   })
 });
 
-router.get('/allTimeStats', function(req,res){
-  knex.raw('SELECT first_name,last_name,profile_image_url,SUM(cash_amount) FROM users JOIN balance_history ON users.id = balance_history.user_id group by first_name order by sum desc;')
+router.get('/alltime', function(req,res){
+  knex.raw('SELECT first_name,users.last_name,profile_image_url,SUM(balance_history.cash_amount) FROM users JOIN balance_history ON users.id = balance_history.user_id group by first_name,last_name,profile_image_url order by sum desc;')
   .then(function(user){
     res.json(user['rows']);
   })
