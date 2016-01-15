@@ -4,7 +4,7 @@ var knex = require('../db/knex');
 var state = require('../gamestate.js');
 
 function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated())
+  if (req.isAuthenticated() && req.user)
     return next();
   else{
     res.json({err: 'not authd'})
