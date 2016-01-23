@@ -50,10 +50,13 @@ app.set('view engine', 'jade');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('tiny'));
+
+var whitelist = [process.env.CLIENT_HOST, process.env.CLIENT_HOST_DEV];
 app.use(cors({
-  //TODO change origin once deployed
-  origin: process.env.CLIENT_HOST,
-  // 'https://stock-kings.firebaseapp.com',
+  origin: function(origin, callback){
+    var originIsWhitelisted = whitelist.indexOf(origin) !== -1;
+    callback(null, originIsWhitelisted);
+  },
   methods: ['GET', 'PUT', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
