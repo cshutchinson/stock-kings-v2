@@ -21,7 +21,7 @@ var state = require('./gamestate.js');
 
 state.currentGameDate = game.updateCurrentGameDate();
 
-setInterval(stockFiveMinutes,300000);
+setInterval(stockFiveMinutes,150000);
 
 
 function stockFiveMinutes(){
@@ -29,14 +29,16 @@ function stockFiveMinutes(){
   console.log('currentGameDate', state.currentGameDate);
   var now = moment().format('dddd');
   var time = moment().tz('America/New_York').format('HH:mm');
-  if(now != 'Saturday' && now != 'Sunday'){
-    if(time > '09:30' && time < '16:00'){
+  // if(now != 'Saturday' && now != 'Sunday'){
+  //   if(time > '09:30' && time < '16:00'){
+  if(true){
+    if(true){
       //Call yahoo api function
       game.callYahooUpdateSymbols();
       console.log('called yahoo update');
     }
     if(time >= '16:00'){
-      game.endGameAndUpdateBalanceHistoryTable();
+      // game.endGameAndUpdateBalanceHistoryTable();
     }
   }
 }
@@ -49,7 +51,7 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('tiny'));
+// app.use(logger('tiny'));
 
 var whitelist = [process.env.CLIENT_HOST, process.env.CLIENT_HOST_DEV];
 app.use(cors({
