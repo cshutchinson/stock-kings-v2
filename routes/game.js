@@ -165,7 +165,6 @@ function callYahooUpdateSymbols(){
   // update symbols db with stock prices
   getSymbolString().then(function(symbolString){
     var symbols = symbolString;
-    console.log(symbols);
     var options = {
         uri: 'http://finance.yahoo.com/webservice/v1/symbols/'+
           symbols + '/quote',
