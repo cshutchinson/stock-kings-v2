@@ -205,7 +205,8 @@ function formatResponse(stockData){
       symbol: stock.resource.fields.symbol,
       name: stock.resource.fields.name,
       price: Number(stock.resource.fields.price).toFixed(2),
-      volume: stock.resource.fields.volume
+      volume: stock.resource.fields.volume,
+      utctime: stock.resource.fields.utctime
     })
   })
   return stockPriceData;
@@ -219,7 +220,8 @@ function insertStockPricesDB(stockDataArray){
       .where('symbol', stock.symbol)
       .update({
         current_price: stock.price,
-        volume: stock.volume
+        volume: stock.volume,
+        last_update: stock.utctime
       }))
     });
     return Promise.all(promiseArray);
