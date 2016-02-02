@@ -2,7 +2,8 @@
   "name": "stock_king",
   "version": "0.0.0",
   "engines": {
-    "node": "4.2.1"
+    "node": "4.2.1",
+    "npm": "3.5.1"
   },
   "private": true,
   "scripts": {
