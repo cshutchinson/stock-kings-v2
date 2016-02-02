@@ -10,19 +10,23 @@ var cors = require('cors')
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var symbols = require('./routes/symbols');
-
+var game = require('./routes/game');
 var auth = require('./routes/auth');
-var session = require('express-session');
+
 var moment = require('moment');
 var tz = require('moment-timezone');
-var game = require('./routes/game');
-
 var state = require('./gamestate.js');
+
+var jwt = require('express-jwt');
+
+var jwtCheck = jwt({
+  secret: new Buffer(process.env.AUTH0_CLIENT_ID, 'base64'),
+  audience: process.env.AUTH0_CLIENT_SECRET
+});
 
 state.currentGameDate = game.updateCurrentGameDate();
 
 setInterval(stockFiveMinutes,150000);
-
 
 function stockFiveMinutes(){
   state.currentGameDate = game.updateCurrentGameDate();
@@ -48,6 +52,9 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+
+//JWT Authorization
+app.use('/users', jwtCheck);
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -76,19 +83,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 //   saveUninitialized:true
 // }));
 
-app.use(auth.passport.initialize());
-app.use(auth.passport.session());
-
-auth.passport.serializeUser(function(user, done) {
-  console.log('serializing user');
-  done(null, user);
-});
-
-auth.passport.deserializeUser(function(user, done) {
-  console.log('deserializing user');
-  console.log(user);
-  done(null, user);
-});
+// app.use(auth.passport.initialize());
+// app.use(auth.passport.session());
+//
+// auth.passport.serializeUser(function(user, done) {
+//   console.log('serializing user');
+//   done(null, user);
+// });
+//
+// auth.passport.deserializeUser(function(user, done) {
+//   console.log('deserializing user');
+//   console.log(user);
+//   done(null, user);
+// });
 
 app.use('/', routes);
 app.use('/users', users);
