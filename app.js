@@ -19,10 +19,10 @@ var state = require('./gamestate.js');
 
 var jwt = require('express-jwt');
 
-var jwtCheck = jwt({
-  secret: new Buffer(process.env.AUTH0_CLIENT_ID, 'base64'),
-  audience: process.env.AUTH0_CLIENT_SECRET
-});
+// var jwtCheck = jwt({
+//   secret: new Buffer(process.env.AUTH0_CLIENT_ID, 'base64'),
+//   audience: process.env.AUTH0_CLIENT_SECRET
+// });
 
 state.currentGameDate = game.updateCurrentGameDate();
 
