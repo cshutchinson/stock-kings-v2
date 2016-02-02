@@ -10,7 +10,6 @@ var env = {
   callbackURL: process.env.CALLBACK_URL
 }
 
-router.get
 
 function insertUser(profile) {
   var user = {
