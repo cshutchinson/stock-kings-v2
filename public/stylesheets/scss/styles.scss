@@ -1,0 +1,15 @@
+$page-background-color: hsl(226, 96%, 13%);
+$font-color: hsl(224, 4%, 87%);
+$font-stack: 'Roboto Condensed', sans-serif;
+$border-color: hsl(211, 0%, 30%);
+
+html {
+  color: $font-color;
+  background-color: $page-background-color;
+  font-family: $font-stack;
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+}

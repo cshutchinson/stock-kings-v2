@@ -1,0 +1,10 @@
+html {
+  color: #dddddf;
+  background-color: #011041;
+  font-family: "Roboto Condensed", sans-serif; }
+  html header {
+    display: flex;
+    align-items: center;
+    justify-content: space-around; }
+
+/*# sourceMappingURL=styles.css.map */
