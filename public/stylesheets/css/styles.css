@@ -2,9 +2,20 @@ html {
   color: #dddddf;
   background-color: #011041;
   font-family: "Roboto Condensed", sans-serif; }
-  html header {
+  html body {
     display: flex;
-    align-items: center;
-    justify-content: space-around; }
+    flex-direction: column;
+    align-items: center; }
+    html body header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 80%; }
+      html body header nav button {
+        border: none;
+        background-color: #011041;
+        color: white;
+        font-family: "Roboto Condensed", sans-serif;
+        cursor: pointer; }
 
 /*# sourceMappingURL=styles.css.map */

@@ -4,3 +4,7 @@ angular.module('stockkings')
   .controller('ResearchController', ResearchController)
   .controller('StandingsController', StandingsController)
   .controller('SupportController', SupportController);
+
+  HomeController.$inject = ['$scope'];
+
+  function HomeController($scope){}

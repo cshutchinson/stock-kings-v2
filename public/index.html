@@ -9,7 +9,7 @@
   <body>
     <header>
       <h1><span class="glyphicon glyphicon-usd"></span>$tock Kings</h1>
-      <nav>
+      <nav ng-controller="Homecontroller">
         <button ui-sref="home" href="/index.html" class="homeButton" type="button" name="home">Home</button>
         <button ui-sref="about" href="/about.html" class="aboutButton" type="button" name="about">About</button>
         <button ui-sref="research" href="/research.html" class="researchButton" type="button" name="research">Research</button>
@@ -20,6 +20,9 @@
     <main ui-view>
 
     </main>
+    <footer>
+      <p class="copyright">&#169; Stock Kings, 2016 + Denver, Colorado</p>
+    </footer>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.js"></script>
     <script src="https://angular-ui.github.io/ui-router/release/angular-ui-router.js" charset="utf-8"></script>
     <script src="app/app.js" charset="utf-8"></script>
