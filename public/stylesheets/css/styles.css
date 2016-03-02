@@ -17,6 +17,7 @@ html {
         background-color: #011041;
         color: white;
         font-family: "Roboto Condensed", sans-serif;
+        font-size: 16px;
         cursor: pointer; }
 
 .hoverGreen {
