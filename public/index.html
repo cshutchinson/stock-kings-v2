@@ -9,12 +9,12 @@
   <body>
     <header>
       <h1><span class="glyphicon glyphicon-usd"></span>$tock Kings</h1>
-      <nav ng-controller="Homecontroller">
-        <button ui-sref="home" href="/index.html" class="homeButton" type="button" name="home">Home</button>
-        <button ui-sref="about" href="/about.html" class="aboutButton" type="button" name="about">About</button>
-        <button ui-sref="research" href="/research.html" class="researchButton" type="button" name="research">Research</button>
-        <button ui-sref="standings" href="/standings.html" class="standingsButton" type="button" name="standings">Standings</button>
-        <button ui-sref="support" href="/support.html" class="supportButton" type="button" name="support">Support</button>
+      <nav>
+        <button ui-sref="home" href="/index.html" type="button" name="home" ng-class="{hoverGreen: home}" ng-mouseenter="home = true" ng-mouseleave="home = false">Home</button>
+        <button ui-sref="about" href="/about.html" type="button" name="about" ng-class="{hoverGreen: about}" ng-mouseenter="about = true" ng-mouseleave="about = false">About</button>
+        <button ui-sref="research" href="/research.html" type="button" name="research" ng-class="{hoverGreen: research}" ng-mouseenter="research = true" ng-mouseleave="research = false">Research</button>
+        <button ui-sref="standings" href="/standings.html" type="button" name="standings" ng-class="{hoverGreen: standings}" ng-mouseenter="standings = true" ng-mouseleave="standings = false">Standings</button>
+        <button ui-sref="support" href="/support.html" type="button" name="support" ng-class="{hoverGreen: support}" ng-mouseenter="support = true" ng-mouseleave="support = false">Support</button>
       </nav>
     </header>
     <main ui-view>

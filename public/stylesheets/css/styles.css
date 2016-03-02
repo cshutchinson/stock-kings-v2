@@ -12,10 +12,14 @@ html {
       justify-content: space-between;
       width: 80%; }
       html body header nav button {
+        outline: none;
         border: none;
         background-color: #011041;
         color: white;
         font-family: "Roboto Condensed", sans-serif;
         cursor: pointer; }
+
+.hoverGreen {
+  background-color: green; }
 
 /*# sourceMappingURL=styles.css.map */

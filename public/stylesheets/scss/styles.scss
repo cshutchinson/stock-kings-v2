@@ -18,6 +18,7 @@ html {
       width: 80%;
       nav {
         button {
+          outline:none;
           border: none;
           background-color: hsl(226, 96%, 13%);
           color: white;
@@ -27,4 +28,8 @@ html {
       }
     }
   }
+}
+
+.hoverGreen{
+  background-color: green;
 }
