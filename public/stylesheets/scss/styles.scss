@@ -7,9 +7,24 @@ html {
   color: $font-color;
   background-color: $page-background-color;
   font-family: $font-stack;
-  header {
+  body{
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-around;
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 80%;
+      nav {
+        button {
+          border: none;
+          background-color: hsl(226, 96%, 13%);
+          color: white;
+          font-family: $font-stack;
+          cursor: pointer;
+        }
+      }
+    }
   }
 }
