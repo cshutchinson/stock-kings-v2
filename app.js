@@ -138,12 +138,12 @@ app.use(function(err, req, res, next) {
 });
 
 // NYT API
-// request.get("http://api.nytimes.com/svc/topstories/v1/{business}.{response-format}?api-key=" + process.env.TIMES_KEY, function (error, response, body) {
-//   if (error) {
-//     console.log("Error!  Request failed - " + error);
-//   } else if (!error && response.statusCode === 200) {
-//     console.log(body);
-//   }
-// });
+request.get("http://api.nytimes.com/svc/topstories/v1/business.json?api-key=" + process.env.TIMES_KEY, function (error, response, body) {
+  if (error) {
+    console.log("Error!  Request failed - " + error);
+  } else if (!error && response.statusCode === 200) {
+    console.log(body);
+  }
+});
 
 module.exports = app;
